@@ -1,17 +1,17 @@
 import {HANDS, isConnected, getRankings, evaluateHand, setConnected} from './game-service.js';
 
 const playButton = document.querySelector('#play');
+const playerName = document.querySelector('#playerName');
 const table = document.querySelector('#highscore');
-// eslint-disable-next-line camelcase
-const server_Button = document.querySelector('#server');
+const status = document.querySelector('#status');
 const username = document.querySelector('#username');
-// eslint-disable-next-line camelcase
-const player_name = document.querySelector('#player_name');
 const back = document.querySelector('#back');
 const start = document.querySelector('#start');
 const game = document.querySelector('#game');
+const scissor = document.querySelector('#scissor');
+const stone = document.querySelector('#stone');
+const paper = document.querySelector('#paper');
 
-// TODO: Create DOM references
 // TODO: How to keep track of App state?
 
 // TODO: Create View functions
@@ -20,57 +20,71 @@ const game = document.querySelector('#game');
 
 // TODO: Replace the following demo code. It should not be included in the final solution
 
-// RANKING //
+// STATUS ON - OFF Button
+status.onclick = function () {
+    if (isConnected()) {
+        status.innerHTML = 'Offline';
+        setConnected(false);
+    } else {
+        status.innerHTML = 'Online';
+        // CODE --> ONLINE
+        setConnected(true);
+    }
+};
+
+// INSERT RANKING in LIST
 getRankings((rankings) => rankings.forEach((rankingEntry) => {
     const row = table.insertRow();
     const rank = row.insertCell(0);
     const name = row.insertCell(1);
     const score = row.insertCell(2);
     rank.innerHTML = rankingEntry.rank;
-    score.innerHTML = rankingEntry.wins;
-    name.innerHTML = rankingEntry.players;
+    name.innerHTML = rankingEntry.name;
+    score.innerHTML = rankingEntry.win;
 }));
 
-server_Button.onclick = function () {
-    if (isConnected()) {
-        server_Button.innerHTML = 'Offline';
-        setConnected(false);
-    } else {
-        server_Button.innerHTML = 'Online';
-        setConnected(true);
-    }
-
-    console.log('Connection: ', isConnected());
-};
-
+// Start Button Funktion
 playButton.onclick = function () {
-    player_name.innerHTML = username.value;
-    start.style.display = 'none';
-    game.style.display = '';
+    start.classList.add('hidden');
+    game.classList.remove('hidden');
+    playerName.innerHTML = username.value;
+    evaluateHand(playerName.innerHTML, 'stone');
 };
 
+// Back to Start Button
 back.onclick = function () {
-    player_name.innerHTML = username.value;
-    game.style.display = 'none';
-    start.style.display = '';
+    playerName.innerHTML = '';
+    start.classList.remove('hidden');
+    game.classList.add('hidden');
 };
 
-function pickHand() {
-    const handIndex = Math.floor(Math.random() * 3);
-    return HANDS[handIndex];
-}
-
+// PRINT WINNWER
 let count = 1;
 
 function printWinner(hand, didWin) {
     console.log(count++, hand, didWin);
 }
 
-for (let i = 1; i < 10; i++) {
-    const playerHand = pickHand();
-    evaluateHand('peter', playerHand,
-        ({
-             systemHand,
-             gameEval,
-         }) => printWinner(playerHand, systemHand, gameEval));
+// START GAME
+function startGame(name, playerHand) {
+    console.log('hello');
+    console.log(name, playerHand);
+    evaluateHand(name, playerHand, ({
+                                        systemHand,
+                                        gameEval,
+                                    }) => printWinner(playerHand, systemHand, gameEval));
 }
+
+// CHOICE SCISSOR
+scissor.onclick = function () {
+    startGame(username.value, HANDS[0]);
+};
+// CHOICE STONE
+stone.onclick = function () {
+    startGame(username.value, HANDS[1]);
+};
+
+// CHOICE PAPER
+paper.onclick = function () {
+    startGame(username.value, HANDS[2]);
+};

@@ -1,6 +1,20 @@
 html {
     text-align: center;
 }
+
 h1 {
-    color: blueviolet;
+    color: darkblue;
+}
+
+.hidden {
+    display: none;
+}
+
+header {
+    background-color: grey;
+}
+
+main {
+    background-image: url("../img/background.jpg");
+    background-repeat: no-repeat;
 }
