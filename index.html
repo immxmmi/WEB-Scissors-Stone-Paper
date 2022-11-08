@@ -28,36 +28,31 @@
         <hr>
         <h2>Login</h2>
         <p>Username</p>
-        <input type="text" id="username" placeholder="Username" required>
-        <input type="submit" id="play" value="Play">
+        <form id="form">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="submit" id="play" value="Play">
+        </form>
         <hr>
     </section>
     <!-- HIGHSCORE -->
 
 
-    <section id="game" class="hidden">
+    <section id="gameSection" class="hidden">
         <h1>Game</h1>
-        <p id="playerName">Spieler Name</p>
+        <p id="name">Spieler Name</p>
 
         <button id="scissor">Schere</button>
         <button id="stone">Stein</button>
         <button id="paper">Papier</button>
         <p>Nächste Rounde in 1</p>
         <h3 id="computer">|Stein|</h3>
-        <button id="back">zurück</button>
+        <button id="back" type="button">zurück</button>
         <hr>
 
-        <button id="test"> TEST</button>
+        <output id="message"></output>
 
         <h2>History</h2>
-        <div id="table">
-            <table id="history">
-                <tr>
-                    <th>Resultat</th>
-                    <th>Spieler</th>
-                    <th>Gegegner</th>
-                </tr>
-            </table>
+        <div id="history">
         </div>
         <hr>
     </section>

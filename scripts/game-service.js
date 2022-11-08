@@ -6,10 +6,11 @@ const computer = document.querySelector('#computer');
 
 // Player Class
 class Player {
-    constructor(rank, name, win) {
+    constructor(rank, name, win, lost) {
         this.rank = rank;
         this.name = name;
         this.win = win;
+        this.lost = lost;
     }
 }
 
@@ -68,7 +69,7 @@ const evalLookup = {
     },
 };
 
-function getGameEval(playerHand, systemHand) {
+export function getGameEval(playerHand, systemHand) {
     return evalLookup[playerHand][systemHand];
 }
 
@@ -78,7 +79,7 @@ function getRankingsFromPlayerStats() {
     let rank = 1;
     const listPlayer = [];
     list.sort((a, b) => ((a.win < b.win) ? 1 : -1));
-    list.forEach((player) => listPlayer.push(new Player(rank++, player.user, player.win)));
+    list.forEach((player) => listPlayer.push(new Player(rank++, player.user, player.win, player.lost)));
     return listPlayer;
 }
 
@@ -103,11 +104,11 @@ export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn
 
     // TODO
 
-    console.log('GAME: ', getGameEval(playerHand, systemHand));
-
     setTimeout(() => gameRecordHandlerCallbackFn({
         playerHand,
         systemHand,
         gameEval,
     }), DELAY_MS);
+
+    return getGameEval(playerHand, systemHand);
 }
