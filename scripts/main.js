@@ -17,7 +17,9 @@ const backButton = document.querySelector('#back');
 const scissor = document.querySelector('#scissor');
 const stone = document.querySelector('#stone');
 const paper = document.querySelector('#paper');
-let historyTable;
+
+// AFTER CREATE
+const historyTable = document.querySelector('#historyTable');
 
 // TEST
 console.assert(playButton != null);
@@ -117,7 +119,7 @@ function renderStart() {
 // Create History
 function renderHistory() {
     history.innerHTML = '<table id="historyTable"><tr> <th>Runde</th> <th>Spieler</th> <th>Gegner</th><th>Gewiner</th></t></tr></table>';
-    historyTable = document.querySelector('#historyTable');
+
 }
 
 // Clean History
@@ -180,8 +182,8 @@ form.addEventListener('submit', (event) => {
     event.preventDefault();
     const user = username.value;
     if (user === '') {
-         console.log('Input of Username is empty !!!');
-         return;
+        console.log('Input of Username is empty !!!');
+        return;
     }
     app.username = username;
     app.currentPage = PAGE.GAME;
@@ -198,6 +200,7 @@ backButton.addEventListener('click', (event) => {
 
 // Insert new History
 function insertIntoHistory(turn, playerHand, systemHand, winner) {
+    const historyTable = document.querySelector('#historyTable');
     const row = historyTable.insertRow();
     const round = row.insertCell(0);
     const hand1 = row.insertCell(1);
@@ -221,15 +224,26 @@ function startGame(handNumber) {
     const playerHand = HANDS[handNumber];
     app.round++;
     // eslint-disable-next-line max-len
-    app.winner = evaluateHand(app.username, playerHand, ({systemHand, gameEval}) => printWinner(playerHand, systemHand, gameEval));
+    app.winner = evaluateHand(app.username, playerHand, ({
+                                                             systemHand,
+                                                             gameEval,
+                                                         }) => printWinner(playerHand, systemHand, gameEval));
     app.finished = true;
     renderMessage(app);
 }
+
 // CHOICE SCISSOR
-scissor.onclick = startGame(0);
+scissor.onclick = function () {
+    startGame(0);
+};
+
 // CHOICE STONE
-stone.onclick = startGame(1);
+stone.onclick = function () {
+    startGame(1);
+};
 // CHOICE PAPER
-paper.onclick = startGame(2);
+paper.onclick = function () {
+    startGame(2);
+};
 
 renderView(app);
