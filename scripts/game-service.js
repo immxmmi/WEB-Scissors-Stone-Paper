@@ -1,18 +1,6 @@
-/*
- * You are allowed to change the code here.
- * However, you are not allowed to change the signature of the exported functions and objects.
- */
-const computer = document.querySelector('#computer');
+import {Player} from './player.js';
 
-// Player Class
-class Player {
-    constructor(rank, name, win, lost) {
-        this.rank = rank;
-        this.name = name;
-        this.win = win;
-        this.lost = lost;
-    }
-}
+const computer = document.querySelector('#computer');
 
 // LOCAL RANK DATA
 const playerStats = {
@@ -23,7 +11,7 @@ const playerStats = {
     },
     Michael: {
         user: 'Michael',
-        win: 3,
+        win: 4,
         lost: 5,
     },
     Lisa: {
@@ -79,7 +67,10 @@ function getRankingsFromPlayerStats() {
     let rank = 1;
     const listPlayer = [];
     list.sort((a, b) => ((a.win < b.win) ? 1 : -1));
-    list.forEach((player) => listPlayer.push(new Player(rank++, player.user, player.win, player.lost)));
+
+    list.forEach((player) => listPlayer.push(
+        new Player(rank++, player.user, player.win, player.lost),
+    ));
     return listPlayer;
 }
 

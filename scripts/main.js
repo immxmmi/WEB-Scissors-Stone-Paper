@@ -1,29 +1,43 @@
 import {HANDS, isConnected, getRankings, evaluateHand, setConnected} from './game-service.js';
-
+// QUERY SELECTOR
+// START
+const form = document.querySelector('#form');
 const playButton = document.querySelector('#play');
 const playerName = document.querySelector('#name');
-const backButton = document.querySelector('#back');
-const messageOutput = document.querySelector('#message');
-const highscoreTable = document.querySelector('#highscore');
-const history = document.querySelector('#history');
+const highScoreTable = document.querySelector('#highScore');
 const status = document.querySelector('#status');
+// GAME
 const username = document.querySelector('#username');
+const messageOutput = document.querySelector('#message');
+const history = document.querySelector('#history');
 const startSection = document.querySelector('#start');
 const gameSection = document.querySelector('#gameSection');
+const backButton = document.querySelector('#back');
+// CHOICE
 const scissor = document.querySelector('#scissor');
 const stone = document.querySelector('#stone');
 const paper = document.querySelector('#paper');
-const form = document.querySelector('#form');
 let historyTable;
 
 // TEST
 console.assert(playButton != null);
 console.assert(backButton != null);
+console.assert(messageOutput != null);
+console.assert(highScoreTable != null);
+console.assert(history != null);
+console.assert(status != null);
+console.assert(username != null);
 console.assert(playerName != null);
+console.assert(startSection != null);
+console.assert(gameSection != null);
+console.assert(scissor != null);
+console.assert(stone != null);
+console.assert(paper != null);
+console.assert(form != null);
 
 // INSERT RANKING in LIST
 getRankings((rankings) => rankings.forEach((rankingEntry) => {
-    const row = highscoreTable.insertRow();
+    const row = highScoreTable.insertRow();
     const rank = row.insertCell(0);
     const name = row.insertCell(1);
     const score = row.insertCell(2);
@@ -34,20 +48,20 @@ getRankings((rankings) => rankings.forEach((rankingEntry) => {
 
 // TODO: How to keep track of App state?
 
-// GLOBAL VAR PAGE
+// ENUM: PAGE
 const PAGE = {
     START: 0,
     GAME: 1,
 };
 
-// GLOBAL VAR  PLAYER
+// ENUM: Player
 const PLAYER = {
     Player: -1,
     None: 0, // DRAW
     Computer: 1,
 };
 
-// STATE (Lokaler Speicher)
+// STATE (Local Storage)
 function newAppState() {
     return {
         online: false,
@@ -102,40 +116,18 @@ function renderStart() {
 
 // Create History
 function renderHistory() {
-    const table = document.createElement('table');
-    const tr = document.createElement('tr');
-    const round = document.createElement('th');
-    const playerHand = document.createElement('th');
-    const systemHand = document.createElement('th');
-    const winner = document.createElement('th');
-
-    table.setAttribute('id', 'historyTable');
-
-    round.innerHTML = 'Runde ';
-    tr.appendChild(round);
-    playerHand.innerHTML = 'Spieler ';
-    tr.appendChild(playerHand);
-    systemHand.innerHTML = 'Gegner ';
-    tr.appendChild(systemHand);
-    winner.innerHTML = 'Gewinner ';
-    tr.appendChild(winner);
-
-    table.appendChild(tr);
-    history.appendChild(table);
+    history.innerHTML = '<table id="historyTable"><tr> <th>Runde</th> <th>Spieler</th> <th>Gegner</th><th>Gewiner</th></t></tr></table>';
     historyTable = document.querySelector('#historyTable');
 }
+
 // Clean History
 function cleanHistory() {
     historyTable.remove();
 }
 
-// Reload Player
-function renderPlayer(app) {
-}
-
 // Reload Notification of Game
-function renderMessage(app) {
-    if (!app.finished) {
+function renderMessage(appState) {
+    if (!appState.finished) {
         messageOutput.innerHTML = '';
         return;
     }
@@ -155,11 +147,10 @@ function renderMessage(app) {
 }
 
 // Reload the full Game
-function renderGame(app) {
+function renderGame(appState) {
     displayGamePage();
     renderHistory();
-    renderPlayer(app);
-    renderMessage(app);
+    renderMessage(appState);
 }
 
 // VAR --> Render Pages
@@ -169,14 +160,14 @@ const RENDER = {
 };
 
 // Reload currentPage
-function renderView(app) {
-    RENDER[app.currentPage](app);
+function renderView(appState) {
+    RENDER[app.currentPage](appState);
 }
 
 // TODO: Register Event Handlers
 
 // RESET GAME
-function resetGame(app) {
+function resetGame() {
     app.currentPlayer = PLAYER.Player;
     app.finished = false;
     app.winner = PLAYER.Player;
@@ -189,7 +180,8 @@ form.addEventListener('submit', (event) => {
     event.preventDefault();
     const user = username.value;
     if (user === '') {
-        return console.log('Input of Username is empty !!!');
+         console.log('Input of Username is empty !!!');
+         return;
     }
     app.username = username;
     app.currentPage = PAGE.GAME;
@@ -224,29 +216,20 @@ function printWinner(hand, didWin) {
 }
 
 // START GAME
-function startGame(playerHand) {
+function startGame(handNumber) {
     // console.log(name, playerHand);
+    const playerHand = HANDS[handNumber];
     app.round++;
-    app.winner = evaluateHand(app.username, playerHand, ({
-                                                             systemHand,
-                                                             gameEval,
-                                                         }) => printWinner(playerHand, systemHand, gameEval));
+    // eslint-disable-next-line max-len
+    app.winner = evaluateHand(app.username, playerHand, ({systemHand, gameEval}) => printWinner(playerHand, systemHand, gameEval));
     app.finished = true;
     renderMessage(app);
 }
-
 // CHOICE SCISSOR
-scissor.onclick = function () {
-    startGame(HANDS[0]);
-};
+scissor.onclick = startGame(0);
 // CHOICE STONE
-stone.onclick = function () {
-    startGame(HANDS[1]);
-};
-
+stone.onclick = startGame(1);
 // CHOICE PAPER
-paper.onclick = function () {
-    startGame(HANDS[2]);
-};
+paper.onclick = startGame(2);
 
 renderView(app);
