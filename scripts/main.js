@@ -19,7 +19,7 @@ const stone = document.querySelector('#stone');
 const paper = document.querySelector('#paper');
 
 // AFTER CREATE
-const historyTable = document.querySelector('#historyTable');
+let historyTable = document.querySelector('#historyTable');
 
 // TEST
 console.assert(playButton != null);
@@ -200,7 +200,8 @@ backButton.addEventListener('click', (event) => {
 
 // Insert new History
 function insertIntoHistory(turn, playerHand, systemHand, winner) {
-    const historyTable = document.querySelector('#historyTable');
+    historyTable = document.querySelector('#historyTable');
+
     const row = historyTable.insertRow();
     const round = row.insertCell(0);
     const hand1 = row.insertCell(1);
@@ -210,7 +211,17 @@ function insertIntoHistory(turn, playerHand, systemHand, winner) {
     round.innerHTML = turn;
     hand1.innerHTML = playerHand;
     hand2.innerHTML = systemHand;
-    win.innerHTML = winner;
+
+    switch (winner) {
+        case -1:
+            win.innerHTML = 'Winner';
+            break;
+        case 1:
+            win.innerHTML = 'Loser';
+            break;
+        default:
+            win.innerHTML = 'Gleichstand';
+    }
 }
 
 function printWinner(hand, didWin) {
