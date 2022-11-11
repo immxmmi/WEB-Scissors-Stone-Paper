@@ -2,11 +2,11 @@ import {HANDS, isConnected, getRankings, evaluateHand, setConnected} from './gam
 // QUERY SELECTOR
 // START
 const form = document.querySelector('#form');
-const playButton = document.querySelector('#play');
-const playerName = document.querySelector('#name');
+const play = document.querySelector('#play');
 const highScoreTable = document.querySelector('#highScore');
 const status = document.querySelector('#status');
 // GAME
+const reception = document.querySelector('#reception');
 const username = document.querySelector('#username');
 const messageOutput = document.querySelector('#message');
 const history = document.querySelector('#history');
@@ -98,6 +98,9 @@ status.onclick = function () {
     changeStatus();
 };
 
+let i = 0;
+const txt = 'Schnick Schnack Schnuck - davon krieg ich nie genug';
+
 // Display Game Page and Hide Start Page
 function displayGamePage() {
     startSection.classList.add('hidden');
@@ -112,20 +115,28 @@ function displayStartPage() {
 
 // TODO: Create View functions
 
+// Render The massage
+function renderStartMessage() {
+    i = 0;
+    reception.innerHTML = '';
+}
+
 // Reload Start
 function renderStart() {
+    renderStartMessage();
     displayStartPage();
 }
 
 // Create History
 function renderHistory() {
-    history.innerHTML = '<table id="historyTable"><tr> <th>Runde</th> <th>Spieler</th> <th>Gegner</th><th>Gewiner</th></t></tr></table>';
-
+    history.innerHTML = '<table id="historyTable" class="table table-dark table-hover"><tr> <th>Runde</th> <th>Spieler</th> <th>Gegner</th><th>Gewiner</th></t></tr></table>';
 }
 
 // Clean History
 function cleanHistory() {
-    historyTable.remove();
+    if (historyTable !== null) {
+        historyTable.remove();
+    }
 }
 
 // Reload Notification of Game
@@ -200,32 +211,35 @@ backButton.addEventListener('click', (event) => {
 });
 
 // Insert new History
-function insertIntoHistory(turn, playerHand, systemHand, winner) {
+function insertIntoHistory(playerHand, systemHand, winner) {
     historyTable = document.querySelector('#historyTable');
+    app.round = historyTable.rows.length;
     const row = historyTable.insertRow();
     const round = row.insertCell(0);
     const hand1 = row.insertCell(1);
     const hand2 = row.insertCell(2);
     const win = row.insertCell(3);
 
-    round.innerHTML = turn;
+    round.innerHTML = app.round;
     hand1.innerHTML = playerHand;
     hand2.innerHTML = systemHand;
-
     switch (winner) {
         case -1:
+            row.setAttribute('class', 'table-success');
             win.innerHTML = 'Winner';
             break;
         case 1:
+            row.setAttribute('class', 'table-danger');
             win.innerHTML = 'Loser';
             break;
         default:
+            row.setAttribute('class', 'table-light');
             win.innerHTML = 'Gleichstand';
     }
 }
 
 function printWinner(hand, didWin) {
-    insertIntoHistory(app.round, hand, didWin, app.winner);
+    insertIntoHistory(hand, didWin, app.winner);
     console.log(hand, didWin);
 }
 
@@ -233,7 +247,6 @@ function printWinner(hand, didWin) {
 function startGame(handNumber) {
     // console.log(name, playerHand);
     const playerHand = HANDS[handNumber];
-    app.round++;
     // eslint-disable-next-line max-len
     app.winner = evaluateHand(app.username, playerHand, (
         {
@@ -260,3 +273,15 @@ paper.onclick = function () {
 };
 
 renderView(app);
+
+function typeWriter() {
+    if (i < txt.length) {
+        reception.innerHTML += txt.charAt(i);
+        i++;
+        setTimeout(typeWriter, 80);
+    }
+}
+
+play.onclick = function () {
+    typeWriter();
+};

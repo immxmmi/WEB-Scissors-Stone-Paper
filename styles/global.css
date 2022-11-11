@@ -11,9 +11,8 @@ header {
     background-color: grey;
 }
 
-main {
-    /*background-image: url("../img/background.jpg");*/
+body {
+    /** background-image: url("../img/background.jpg"); **/
     background-repeat: no-repeat;
 }
-
 
