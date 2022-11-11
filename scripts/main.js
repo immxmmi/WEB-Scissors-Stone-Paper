@@ -1,4 +1,11 @@
-import {HANDS, isConnected, getRankings, evaluateHand, setConnected, computer} from './game-service.js';
+import {
+    HANDS,
+    isConnected,
+    getRankings,
+    evaluateHand,
+    setConnected,
+    computer
+} from './game-service.js';
 // QUERY SELECTOR
 // START
 const form = document.querySelector('#form');
@@ -101,7 +108,7 @@ status.onclick = function () {
 let i = 0;
 const txt = 'Schnick Schnack Schnuck - davon krieg ich nie genug';
 
-function renderComputerChoice(){
+function renderComputerChoice() {
     computer.innerHTML = '|?|';
 }
 
@@ -144,6 +151,7 @@ function cleanHistory() {
     }
 }
 
+
 // Reload Notification of Game
 function renderMessage(appState) {
     if (!appState.finished) {
@@ -152,16 +160,16 @@ function renderMessage(appState) {
     }
 
     if (app.winner === PLAYER.None) {
-        messageOutput.innerHTML = 'It\'s a draw!';
+        messageOutput.innerHTML = '<strong>It\'s a draw!</strong>';
         return;
     }
 
     if (app.winner === PLAYER.Player) {
-        messageOutput.innerHTML = '<span class="player">You</span> are the winner. Congrats';
+        messageOutput.innerHTML = '<stong>You are the winner. Congrats</stong>';
     }
 
     if (app.winner === PLAYER.Computer) {
-        messageOutput.innerHTML = 'Sorry. You lost. Try again.';
+        messageOutput.innerHTML = '<strong>Sorry. You lost. Try again.</strong>';
     }
 }
 
@@ -231,14 +239,17 @@ function insertIntoHistory(playerHand, systemHand, winner) {
     switch (winner) {
         case -1:
             row.setAttribute('class', 'table-success');
+            messageOutput.setAttribute('class', 'alert alert-success alert-dismissible fade show');
             win.innerHTML = 'Winner';
             break;
         case 1:
             row.setAttribute('class', 'table-danger');
+            messageOutput.setAttribute('class', 'alert alert-danger alert-dismissible fade show');
             win.innerHTML = 'Loser';
             break;
         default:
             row.setAttribute('class', 'table-light');
+            messageOutput.setAttribute('class', 'alert alert-primary alert-dismissible fade show');
             win.innerHTML = 'Gleichstand';
     }
 }
