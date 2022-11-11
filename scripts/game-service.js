@@ -1,6 +1,6 @@
 import {Player} from './player.js';
 
-const computer = document.querySelector('#computer');
+export const computer = document.querySelector('#computer');
 
 // LOCAL RANK DATA
 const playerStats = {

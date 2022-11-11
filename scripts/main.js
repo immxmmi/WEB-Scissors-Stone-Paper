@@ -1,4 +1,4 @@
-import {HANDS, isConnected, getRankings, evaluateHand, setConnected} from './game-service.js';
+import {HANDS, isConnected, getRankings, evaluateHand, setConnected, computer} from './game-service.js';
 // QUERY SELECTOR
 // START
 const form = document.querySelector('#form');
@@ -101,8 +101,13 @@ status.onclick = function () {
 let i = 0;
 const txt = 'Schnick Schnack Schnuck - davon krieg ich nie genug';
 
+function renderComputerChoice(){
+    computer.innerHTML = '|?|';
+}
+
 // Display Game Page and Hide Start Page
 function displayGamePage() {
+    renderComputerChoice();
     startSection.classList.add('hidden');
     gameSection.classList.remove('hidden');
 }
