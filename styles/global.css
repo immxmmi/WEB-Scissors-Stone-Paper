@@ -1,6 +1,3 @@
-html {
-    text-align: center;
-}
 
 h1 {
     color: darkblue;
@@ -18,3 +15,5 @@ main {
     /*background-image: url("../img/background.jpg");*/
     background-repeat: no-repeat;
 }
+
+

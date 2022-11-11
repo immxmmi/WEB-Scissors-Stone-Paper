@@ -21,31 +21,28 @@ const paper = document.querySelector('#paper');
 // AFTER CREATE
 let historyTable = document.querySelector('#historyTable');
 
-// TEST
-console.assert(playButton != null);
-console.assert(backButton != null);
-console.assert(messageOutput != null);
-console.assert(highScoreTable != null);
-console.assert(history != null);
-console.assert(status != null);
-console.assert(username != null);
-console.assert(playerName != null);
-console.assert(startSection != null);
-console.assert(gameSection != null);
-console.assert(scissor != null);
-console.assert(stone != null);
-console.assert(paper != null);
-console.assert(form != null);
-
 // INSERT RANKING in LIST
 getRankings((rankings) => rankings.forEach((rankingEntry) => {
     const row = highScoreTable.insertRow();
+
+    switch (rankingEntry.rank) {
+        case 1:
+            row.setAttribute('class', 'table-success');
+            break;
+        case rankings.length:
+            row.setAttribute('class', 'table-danger');
+            break;
+        default:
+            row.setAttribute('class', 'table-light');
+    }
+
     const rank = row.insertCell(0);
     const name = row.insertCell(1);
     const score = row.insertCell(2);
     rank.innerHTML = rankingEntry.rank;
     name.innerHTML = rankingEntry.name;
     score.innerHTML = rankingEntry.win;
+    console.log(rankings.length);
 }));
 
 // TODO: How to keep track of App state?
@@ -82,10 +79,14 @@ const app = newAppState();
 function changeStatus() {
     if (isConnected()) {
         status.innerHTML = 'Offline';
+        status.removeAttribute('class');
+        status.setAttribute('class', 'btn btn-danger');
         app.online = false;
         setConnected(false);
     } else {
         status.innerHTML = 'Online';
+        status.removeAttribute('class');
+        status.setAttribute('class', 'btn btn-success');
         // CODE --> ONLINE
         app.online = true;
         setConnected(true);
@@ -201,7 +202,6 @@ backButton.addEventListener('click', (event) => {
 // Insert new History
 function insertIntoHistory(turn, playerHand, systemHand, winner) {
     historyTable = document.querySelector('#historyTable');
-
     const row = historyTable.insertRow();
     const round = row.insertCell(0);
     const hand1 = row.insertCell(1);
@@ -235,10 +235,12 @@ function startGame(handNumber) {
     const playerHand = HANDS[handNumber];
     app.round++;
     // eslint-disable-next-line max-len
-    app.winner = evaluateHand(app.username, playerHand, ({
-                                                             systemHand,
-                                                             gameEval,
-                                                         }) => printWinner(playerHand, systemHand, gameEval));
+    app.winner = evaluateHand(app.username, playerHand, (
+        {
+            systemHand,
+            gameEval,
+        },
+    ) => printWinner(playerHand, systemHand, gameEval));
     app.finished = true;
     renderMessage(app);
 }
