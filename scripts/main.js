@@ -4,7 +4,7 @@ import {
     getRankings,
     evaluateHand,
     setConnected,
-    computer
+    computer,
 } from './game-service.js';
 // QUERY SELECTOR
 // START
@@ -15,6 +15,7 @@ const status = document.querySelector('#status');
 // GAME
 const reception = document.querySelector('#reception');
 const username = document.querySelector('#username');
+const displayName = document.querySelector('#displayName');
 const messageOutput = document.querySelector('#message');
 const history = document.querySelector('#history');
 const startSection = document.querySelector('#start');
@@ -49,7 +50,6 @@ getRankings((rankings) => rankings.forEach((rankingEntry) => {
     rank.innerHTML = rankingEntry.rank;
     name.innerHTML = rankingEntry.name;
     score.innerHTML = rankingEntry.win;
-    console.log(rankings.length);
 }));
 
 // TODO: How to keep track of App state?
@@ -114,6 +114,7 @@ function renderComputerChoice() {
 
 // Display Game Page and Hide Start Page
 function displayGamePage() {
+    displayName.innerHTML = username.innerHTML;
     renderComputerChoice();
     startSection.classList.add('hidden');
     gameSection.classList.remove('hidden');
@@ -150,7 +151,6 @@ function cleanHistory() {
         historyTable.remove();
     }
 }
-
 
 // Reload Notification of Game
 function renderMessage(appState) {
@@ -250,13 +250,12 @@ function insertIntoHistory(playerHand, systemHand, winner) {
         default:
             row.setAttribute('class', 'table-light');
             messageOutput.setAttribute('class', 'alert alert-primary alert-dismissible fade show');
-            win.innerHTML = 'Gleichstand';
+            win.innerHTML = 'Draw';
     }
 }
 
 function printWinner(hand, didWin) {
     insertIntoHistory(hand, didWin, app.winner);
-    console.log(hand, didWin);
 }
 
 // START GAME
