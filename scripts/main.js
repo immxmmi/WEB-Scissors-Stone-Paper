@@ -1,70 +1,69 @@
 import {
-    HANDS,
-    isConnected,
-    getRankings,
-    evaluateHand,
-    setConnected,
-    computer,
+    HANDS, isConnected, getRankings, evaluateHand, setConnected, computer, DELAY_MS,
 } from './game-service.js';
 // QUERY SELECTOR
+
 // START
 const form = document.querySelector('#form');
 const play = document.querySelector('#play');
 const highScoreTable = document.querySelector('#highScore');
 const status = document.querySelector('#status');
+
 // GAME
 const reception = document.querySelector('#reception');
-const username = document.querySelector('#username');
+const username = document.querySelector('#username-input');
 const displayName = document.querySelector('#displayName');
 const messageOutput = document.querySelector('#message');
 const history = document.querySelector('#history');
 const startSection = document.querySelector('#start');
 const gameSection = document.querySelector('#gameSection');
 const backButton = document.querySelector('#back');
+
 // CHOICE
 const scissor = document.querySelector('#scissor');
 const stone = document.querySelector('#stone');
 const paper = document.querySelector('#paper');
+const fountain = document.querySelector('#fountain');
+const match = document.querySelector('#match');
+
+const timer = document.querySelector('#timer');
 
 // AFTER CREATE
 let historyTable = document.querySelector('#historyTable');
 
 // INSERT RANKING in LIST
-getRankings((rankings) => rankings.forEach((rankingEntry) => {
-    const row = highScoreTable.insertRow();
+function reloadRanking() {
+    highScoreTable.innerHTML = '';
+    highScoreTable.innerHTML = '<tr><td>Rank</td><td>Player</td><td>Score</td></tr>';
+    getRankings((rankings) => rankings.forEach((rankingEntry) => {
+        const row = highScoreTable.insertRow();
+        switch (rankingEntry.rank) {
+            case 1:
+                row.setAttribute('class', 'table-success');
+                break;
+            default:
+                row.setAttribute('class', 'table-light');
+        }
 
-    switch (rankingEntry.rank) {
-        case 1:
-            row.setAttribute('class', 'table-success');
-            break;
-        case rankings.length:
-            row.setAttribute('class', 'table-danger');
-            break;
-        default:
-            row.setAttribute('class', 'table-light');
-    }
-
-    const rank = row.insertCell(0);
-    const name = row.insertCell(1);
-    const score = row.insertCell(2);
-    rank.innerHTML = rankingEntry.rank;
-    name.innerHTML = rankingEntry.name;
-    score.innerHTML = rankingEntry.win;
-}));
-
-// TODO: How to keep track of App state?
+        const rank = row.insertCell(0);
+        const name = row.insertCell(1);
+        const score = row.insertCell(2);
+        rank.innerHTML = rankingEntry.rank;
+        name.innerHTML = rankingEntry.name;
+        score.innerHTML = rankingEntry.win;
+    }));
+}
 
 // ENUM: PAGE
 const PAGE = {
-    START: 0,
-    GAME: 1,
+    START: 0, GAME: 1,
 };
 
 // ENUM: Player
 const PLAYER = {
-    Player: -1,
+    Player: 1,
     None: 0, // DRAW
-    Computer: 1,
+    Computer: -1,
 };
 
 // STATE (Local Storage)
@@ -76,6 +75,7 @@ function newAppState() {
         username: '',
         currentPage: PAGE.START,
         winner: PLAYER.Player,
+        status: 'light',
     };
 }
 
@@ -100,35 +100,41 @@ function changeStatus() {
     }
 }
 
-// STATUS ON - OFF Button
-status.onclick = function () {
-    changeStatus();
-};
-
-let i = 0;
-const txt = 'Schnick Schnack Schnuck - davon krieg ich nie genug';
-
+function setComputerChoice(systemHand) {
+    computer.innerHTML = systemHand;
+}
 function renderComputerChoice() {
     computer.innerHTML = '|?|';
 }
 
+// Hide Element
+function showElement(element) {
+    element.classList.remove('hidden');
+}
+
+// Show Element
+function hideElement(element) {
+    element.classList.add('hidden');
+}
+
 // Display Game Page and Hide Start Page
 function displayGamePage() {
-    displayName.innerHTML = username.innerHTML;
+    displayName.innerHTML = app.username;
     renderComputerChoice();
-    startSection.classList.add('hidden');
-    gameSection.classList.remove('hidden');
+    hideElement(startSection);
+    showElement(gameSection);
 }
 
 // Display Start Page and Hide Game Page
 function displayStartPage() {
-    gameSection.classList.add('hidden');
-    startSection.classList.remove('hidden');
+    reloadRanking();
+    hideElement(gameSection);
+    showElement(startSection);
 }
 
-// TODO: Create View functions
-
 // Render The massage
+let i = 0;
+
 function renderStartMessage() {
     i = 0;
     reception.innerHTML = '';
@@ -159,17 +165,15 @@ function renderMessage(appState) {
         return;
     }
 
-    if (app.winner === PLAYER.None) {
-        messageOutput.innerHTML = '<strong>It\'s a draw!</strong>';
-        return;
-    }
-
-    if (app.winner === PLAYER.Player) {
-        messageOutput.innerHTML = '<stong>You are the winner. Congrats</stong>';
-    }
-
-    if (app.winner === PLAYER.Computer) {
-        messageOutput.innerHTML = '<strong>Sorry. You lost. Try again.</strong>';
+    switch (app.winner) {
+        case PLAYER.Player:
+            messageOutput.innerHTML = '<strong>You are the winner. Congrats</strong>';
+            return;
+        case PLAYER.Computer:
+            messageOutput.innerHTML = '<strong>Sorry. You lost. Try again!</strong>';
+            return;
+        default:
+            messageOutput.innerHTML = '<strong>It\'s a draw!</strong>';
     }
 }
 
@@ -182,16 +186,13 @@ function renderGame(appState) {
 
 // VAR --> Render Pages
 const RENDER = {
-    [PAGE.START]: renderStart,
-    [PAGE.GAME]: renderGame,
+    [PAGE.START]: renderStart, [PAGE.GAME]: renderGame,
 };
 
 // Reload currentPage
 function renderView(appState) {
     RENDER[app.currentPage](appState);
 }
-
-// TODO: Register Event Handlers
 
 // RESET GAME
 function resetGame() {
@@ -202,92 +203,82 @@ function resetGame() {
     cleanHistory();
 }
 
-// Start Playing: Check Input of Username and set AppState
-form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const user = username.value;
-    if (user === '') {
-        console.log('Input of Username is empty !!!');
-        return;
-    }
-    app.username = username;
-    app.currentPage = PAGE.GAME;
-    renderView(app);
-});
-
-// Return to startPage
-backButton.addEventListener('click', (event) => {
-    event.preventDefault();
-    resetGame(app);
-    app.currentPage = PAGE.START;
-    renderView(app);
-});
-
-// Insert new History
-function insertIntoHistory(playerHand, systemHand, winner) {
-    historyTable = document.querySelector('#historyTable');
-    app.round = historyTable.rows.length;
-    const row = historyTable.insertRow();
-    const round = row.insertCell(0);
-    const hand1 = row.insertCell(1);
-    const hand2 = row.insertCell(2);
-    const win = row.insertCell(3);
-
-    round.innerHTML = app.round;
-    hand1.innerHTML = playerHand;
-    hand2.innerHTML = systemHand;
-    switch (winner) {
-        case -1:
-            row.setAttribute('class', 'table-success');
-            messageOutput.setAttribute('class', 'alert alert-success alert-dismissible fade show');
-            win.innerHTML = 'Winner';
-            break;
-        case 1:
-            row.setAttribute('class', 'table-danger');
-            messageOutput.setAttribute('class', 'alert alert-danger alert-dismissible fade show');
-            win.innerHTML = 'Loser';
-            break;
-        default:
-            row.setAttribute('class', 'table-light');
-            messageOutput.setAttribute('class', 'alert alert-primary alert-dismissible fade show');
-            win.innerHTML = 'Draw';
-    }
+// Result of Game
+function setGameStatus(result) {
+    const alert = {'-1': 'danger', 0: 'light', 1: 'success'};
+    app.status = alert[result];
 }
 
-function printWinner(hand, didWin) {
-    insertIntoHistory(hand, didWin, app.winner);
+// Set Message Alert Color
+function setAlert() {
+    const alert = `alert alert-${app.status} alert-dismissible fade show`;
+    messageOutput.setAttribute('class', alert);
+}
+
+// Insert new History
+function insertIntoHistory(playerHand, systemHand) {
+    historyTable = document.querySelector('#historyTable');
+    app.round = historyTable.rows.length;
+    const notice = {danger: 'Computer', light: 'Draw', success: app.username};
+    historyTable.innerHTML += `<tr class="table-${app.status}">
+    <td>${app.round}</td>
+    <td>${playerHand}</td>
+    <td>${systemHand}</td>
+    <td>${notice[app.status]}</td>
+  </tr>`;
+}
+
+// DISABLE BUTTONS
+function disableGameButtons() {
+    scissor.disabled = true;
+    stone.disabled = true;
+    paper.disabled = true;
+    fountain.disabled = true;
+    match.disabled = true;
+}
+
+// ENABLE BUTTONS
+function enableGameButtons() {
+    scissor.disabled = false;
+    stone.disabled = false;
+    paper.disabled = false;
+    fountain.disabled = false;
+    match.disabled = false;
+}
+
+function loadGame(handNumber) {
+    const playerHand = HANDS[handNumber];
+    app.finished = true;
+    evaluateHand(app.username, playerHand, ({systemHand, gameEval}) => {
+        setComputerChoice(systemHand);
+        app.winner = gameEval;
+        setGameStatus(app.winner);
+        insertIntoHistory(playerHand, systemHand, app.winner);
+        setAlert();
+        renderMessage(app);
+    });
+    enableGameButtons();
+    renderComputerChoice();
 }
 
 // START GAME
 function startGame(handNumber) {
-    // console.log(name, playerHand);
-    const playerHand = HANDS[handNumber];
-    // eslint-disable-next-line max-len
-    app.winner = evaluateHand(app.username, playerHand, (
-        {
-            systemHand,
-            gameEval,
-        },
-    ) => printWinner(playerHand, systemHand, gameEval));
-    app.finished = true;
-    renderMessage(app);
+    app.finished = false;
+    disableGameButtons();
+    let count = 3;
+    const countdown = setInterval(() => {
+        if (count < 0) {
+            loadGame(handNumber);
+            clearInterval(countdown);
+        } else {
+            timer.innerText = `Nächste Runde startet in ${count} Sekunden`;
+            count--;
+        }
+    }, 1000);
 }
 
-// CHOICE SCISSOR
-scissor.onclick = function () {
-    startGame(0);
-};
-
-// CHOICE STONE
-stone.onclick = function () {
-    startGame(1);
-};
-// CHOICE PAPER
-paper.onclick = function () {
-    startGame(2);
-};
-
-renderView(app);
+// Auto Type Title
+const txt = 'Schnick Schnack Schnuck - davon krieg ich nie genug';
 
 function typeWriter() {
     if (i < txt.length) {
@@ -297,6 +288,54 @@ function typeWriter() {
     }
 }
 
-play.onclick = function () {
+// EventListener
+
+// STATUS ON - OFF Button
+status.addEventListener('click', () => {
+    changeStatus();
+});
+// Start Playing: Check Input of Username and set AppState
+form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const user = username.value;
+
+    if (user === '') {
+        return;
+    }
+    app.username = user;
+    app.currentPage = PAGE.GAME;
+    renderView(app);
+});
+// Start Playing
+play.addEventListener('click', () => {
     typeWriter();
-};
+});
+// CHOICE SCISSOR
+scissor.addEventListener('click', () => {
+    startGame(0);
+});
+// CHOICE STONE
+stone.addEventListener('click', () => {
+    startGame(1);
+});
+// CHOICE PAPER
+paper.addEventListener('click', () => {
+    startGame(2);
+});
+// CHOICE FOUNTAIN
+fountain.addEventListener('click', () => {
+    startGame(3);
+});
+// CHOICE MATCH
+match.addEventListener('click', () => {
+    startGame(4);
+});
+// Return to startPage
+backButton.addEventListener('click', (event) => {
+    event.preventDefault();
+    resetGame(app);
+    app.currentPage = PAGE.START;
+    renderView(app);
+});
+
+renderView(app);

@@ -42,7 +42,7 @@
                         <h2>Login</h2>
                         <form id="form">
                             <div class="input-group mb-3">
-                                <input type="text" class="form-control" placeholder="Username" id="username"
+                                <input type="text" class="form-control" placeholder="Username" id="username-input"
                                        aria-label="Username" aria-describedby="button-addon2"
                                        required>
                                 <button class="btn btn-success" type="submit" id="play">Play</button>
@@ -55,6 +55,7 @@
         <hr>
     </section>
 
+
     <section id="gameSection" class="hidden">
         <div class="container">
             <div class="row justify-content-center">
@@ -66,20 +67,29 @@
                 </button>
             </div>
             <div class="row justify-content-center">
-                <p id="displayName">Spieler Name</p>
+                <p><strong>Spieler: </strong><a id="displayName"></a></p>
+
                 <div class="col align-self-center">
-                    <button id="scissor"><img src="/img/scissors.png" alt="stone" width="80" height="80"></button>
+                    <button id="scissor"><img src="/img/scissors.png" alt="stone"class="logo"></button>
                 </div>
                 <div class="col align-self-center">
-                    <button id="stone"><img src="/img/stone.png" alt="stone" width="80" height="80"></button>
+                    <button id="stone"><img src="/img/stone.png" alt="stone" class="logo"></button>
                 </div>
                 <div class="col align-self-center">
-                    <button id="paper"><img src="/img/paper.png" alt="stone" width="80" height="80"></button>
+                    <button id="paper"><img src="/img/paper.png" alt="stone" class="logo"></button>
                 </div>
-                <p>Nächste Rounde in 1</p>
-                <h3 id="computer">|?|</h3>
+                <div class="col align-self-center">
+                    <button id="fountain"><img src="/img/fountain.png" alt="fountain" class="logo"></button>
+                </div>
+                <div class="col align-self-center">
+                    <button id="match"><img src="/img/match.svg" alt="match" class="logo"></button>
+                </div>
                 <div>
+                    <p id="timer">-</p>
+                    <h3 id="computer">|?|</h3>
                     <button id="back" type="button">zurück</button>
+                </div>
+                <div>
                     <hr>
                     <h2>History</h2>
                     <div id="history">
