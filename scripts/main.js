@@ -13,7 +13,6 @@ const status = document.getElementById('status');
 const reception = document.getElementById('reception');
 const username = document.getElementById('username-input');
 const displayName = document.getElementById('displayName');
-const messageOutput = document.getElementById('message');
 const history = document.getElementById('history');
 const startSection = document.getElementById('start');
 const gameSection = document.getElementById('gameSection');
@@ -34,7 +33,7 @@ let historyTable = document.getElementById('historyTable');
 // INSERT RANKING in LIST
 function reloadRanking() {
     highScoreTable.innerHTML = '';
-    highScoreTable.innerHTML = '<tr><td>Rank</td><td>Player</td><td>Score</td></tr>';
+    highScoreTable.innerHTML = '<tr><td>Rank</td><td>Player</td><td>Win</td><td>Lost</td></tr>';
     getRankings((rankings) => rankings.forEach((rankingEntry) => {
         let tableColor;
         if (rankingEntry.rank === 1) {
@@ -42,7 +41,7 @@ function reloadRanking() {
         } else {
             tableColor = 'light';
         }
-        highScoreTable.innerHTML += `<tbody class="table-${tableColor}"><td> ${rankingEntry.rank} </td> <td> ${rankingEntry.name}</td><td>${rankingEntry.win}</td></tbody>`;
+        highScoreTable.innerHTML += `<tbody class="table-${tableColor}"><td> ${rankingEntry.rank} </td> <td> ${rankingEntry.name}</td><td>${rankingEntry.win}</td><td>${rankingEntry.lost}</td></tbody>`;
     }));
 }
 
@@ -75,23 +74,7 @@ function newAppState() {
 // INSTANCE of Game
 const app = newAppState();
 
-// Change Online Status
-function changeStatus() {
-    if (isConnected()) {
-        status.innerHTML = 'Offline';
-        status.removeAttribute('class');
-        status.setAttribute('class', 'btn btn-danger');
-        app.online = false;
-        setConnected(false);
-    } else {
-        status.innerHTML = 'Online';
-        status.removeAttribute('class');
-        status.setAttribute('class', 'btn btn-success');
-        // CODE --> ONLINE
-        app.online = true;
-        setConnected(true);
-    }
-}
+
 
 function setComputerChoice() {
     computer.innerHTML = app.systemChoice;
@@ -127,10 +110,10 @@ function displayStartPage() {
 }
 
 // Render The massage
-let i = 0;
+let letterIndex = 0;
 
 function renderStartMessage() {
-    i = 0;
+    letterIndex = 0;
     reception.innerHTML = '';
 }
 
@@ -138,6 +121,7 @@ function renderStartMessage() {
 function renderStart() {
     renderStartMessage();
     displayStartPage();
+    status.disabled = false;
 }
 
 // Create History
@@ -152,21 +136,11 @@ function cleanHistory() {
     }
 }
 
-// Reload Notification of Game
-function renderMessage(appState) {
-    if (!appState.finished) {
-        messageOutput.innerHTML = '';
-        return;
-    }
-    const message = { '-1': 'Sorry. You lost. Try again!', 1: 'You are the winner. Congrats', 0: 'It\'s a draw!'};
-    messageOutput.innerHTML = `<strong>${message[app.winner]}</strong>`;
-}
-
 // Reload the full Game
-function renderGame(appState) {
+function renderGame() {
     displayGamePage();
     renderHistory();
-    renderMessage(appState);
+    status.disabled = true;
 }
 
 // VAR --> Render Pages
@@ -185,6 +159,7 @@ function resetGame() {
     app.finished = false;
     app.winner = PLAYER.Player;
     app.round = 0;
+    username.value = '';
     cleanHistory();
 }
 
@@ -192,12 +167,6 @@ function resetGame() {
 function setGameStatus(result) {
     const alert = {'-1': 'danger', 0: 'light', 1: 'success'};
     app.status = alert[result];
-}
-
-// Set Message Alert Color
-function setAlert() {
-    const alert = `alert alert-${app.status} alert-dismissible fade show`;
-    messageOutput.setAttribute('class', alert);
 }
 
 // Insert new History
@@ -240,10 +209,7 @@ function loadGame(handNumber) {
         setComputerChoice();
         setGameStatus(app.winner);
         insertIntoHistory(playerHand, systemHand, app.winner);
-        setAlert();
-        renderMessage(app);
     });
-    enableGameButtons();
 }
 
 // START GAME
@@ -251,10 +217,11 @@ function startGame(handNumber) {
     app.finished = false;
     disableGameButtons();
     let count = 3;
+    loadGame(handNumber);
     const countdown = setInterval(() => {
         if (count < 0) {
-            loadGame(handNumber);
             clearInterval(countdown);
+            enableGameButtons();
         } else {
             timer.innerText = `Nächste Runde startet in ${count} Sekunden`;
             count--;
@@ -266,13 +233,32 @@ function startGame(handNumber) {
 const txt = 'Schnick Schnack Schnuck - davon krieg ich nie genug';
 
 function typeWriter() {
-    if (i < txt.length) {
-        reception.innerHTML += txt.charAt(i);
-        i++;
+    if (letterIndex < txt.length) {
+        reception.innerHTML += txt.charAt(letterIndex);
+        letterIndex++;
         setTimeout(typeWriter, 80);
     }
 }
 
+// Change Online Status
+function changeStatus() {
+    if (isConnected()) {
+        status.innerHTML = 'Offline';
+        status.removeAttribute('class');
+        status.setAttribute('class', 'btn btn-danger');
+        app.online = false;
+        setConnected(false);
+        reloadRanking();
+    } else {
+        status.innerHTML = 'Online';
+        status.removeAttribute('class');
+        status.setAttribute('class', 'btn btn-success');
+        // CODE --> ONLINE
+        app.online = true;
+        setConnected(true);
+        reloadRanking();
+    }
+}
 // EventListener
 
 // STATUS ON - OFF Button
@@ -315,7 +301,7 @@ match.addEventListener('click', () => {
 backButton.addEventListener('click', (event) => {
     event.preventDefault();
     resetGame(app);
-    app.currentPage = PAGE.START;
+    app.currentPage = PAGE.START;;
     renderView(app);
 });
 

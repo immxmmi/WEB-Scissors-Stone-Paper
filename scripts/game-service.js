@@ -19,14 +19,17 @@ const playerStats = {
     },
 };
 
+
 // TIMER
 export const DELAY_MS = 1000;
 
 // CONNECTION
 let isConnectedState = false;
+
 export function setConnected(newIsConnected) {
     isConnectedState = Boolean(newIsConnected);
 }
+
 export function isConnected() {
     return isConnectedState;
 }
@@ -73,29 +76,64 @@ const evalLookup = {
     },
 };
 
+function getRankgingFromServer() {
+    const url = 'https://stone.sifs0005.infs.ch/ranking';
+    const listPlayer = [];
+    let playerList;
+    fetch(url, {
+        method: 'GET',
+    })
+        .then((response) => response.json())
+        .then((json) => {
+            playerList = Object.values(json);
+            let rank = 1;
+            playerList.sort((a, b) => ((a.win < b.win) ? 1 : -1));
+            playerList.forEach((player) => {
+                if (listPlayer.length !== 0) {
+                    if (listPlayer[listPlayer.length - 1].win !== player.win) {
+                        rank++;
+                    }
+                }
+                if (player.win > 2) {
+                    listPlayer.push(
+                        new Player(rank, player.user, player.win, player.lost),
+                    );
+                }
+            });
+        });
+    return listPlayer;
+}
+
 // GET LOCAL RANKING
-function getRankingsFromPlayerStats() {
+function getRangingFromLocal() {
+    // offline
     const playerList = Object.values(playerStats);
     let rank = 1;
     const listPlayer = [];
     playerList.sort((a, b) => ((a.win < b.win) ? 1 : -1));
-
     playerList.forEach((player) => {
         if (listPlayer.length !== 0) {
             if (listPlayer[listPlayer.length - 1].win !== player.win) {
-               rank++;
+                rank++;
             }
         }
         listPlayer.push(
-            new Player(rank, player.user, player.win),
+            new Player(rank, player.user, player.win, player.lost),
         );
     });
     return listPlayer;
 }
+
 export function getRankings(rankingsCallbackHandlerFn) {
-    const rankingsArray = getRankingsFromPlayerStats();
+    let rankingsArray;
+    if (isConnected()) {
+        rankingsArray = getRankgingFromServer();
+    } else {
+         rankingsArray = getRangingFromLocal();
+    }
     setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
+
 export function addResultToRanking(playerName, gameResult) {
     // Game is a draw don´t save it in the playerStats
     if (gameResult === 0) {
