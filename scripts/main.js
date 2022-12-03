@@ -36,21 +36,13 @@ function reloadRanking() {
     highScoreTable.innerHTML = '';
     highScoreTable.innerHTML = '<tr><td>Rank</td><td>Player</td><td>Score</td></tr>';
     getRankings((rankings) => rankings.forEach((rankingEntry) => {
-        const row = highScoreTable.insertRow();
-        switch (rankingEntry.rank) {
-            case 1:
-                row.setAttribute('class', 'table-success');
-                break;
-            default:
-                row.setAttribute('class', 'table-light');
+        let tableColor;
+        if (rankingEntry.rank === 1) {
+            tableColor = 'success';
+        } else {
+            tableColor = 'light';
         }
-
-        const rank = row.insertCell(0);
-        const name = row.insertCell(1);
-        const score = row.insertCell(2);
-        rank.innerHTML = rankingEntry.rank;
-        name.innerHTML = rankingEntry.name;
-        score.innerHTML = rankingEntry.win;
+        highScoreTable.innerHTML += `<tbody class="table-${tableColor}"><td> ${rankingEntry.rank} </td> <td> ${rankingEntry.name}</td><td>${rankingEntry.win}</td></tbody>`;
     }));
 }
 
@@ -75,6 +67,7 @@ function newAppState() {
         username: '',
         currentPage: PAGE.START,
         winner: PLAYER.Player,
+        systemChoice: '|?|',
         status: 'light',
     };
 }
@@ -100,9 +93,10 @@ function changeStatus() {
     }
 }
 
-function setComputerChoice(systemHand) {
-    computer.innerHTML = systemHand;
+function setComputerChoice() {
+    computer.innerHTML = app.systemChoice;
 }
+
 function renderComputerChoice() {
     computer.innerHTML = '|?|';
 }
@@ -164,17 +158,8 @@ function renderMessage(appState) {
         messageOutput.innerHTML = '';
         return;
     }
-
-    switch (app.winner) {
-        case PLAYER.Player:
-            messageOutput.innerHTML = '<strong>You are the winner. Congrats</strong>';
-            return;
-        case PLAYER.Computer:
-            messageOutput.innerHTML = '<strong>Sorry. You lost. Try again!</strong>';
-            return;
-        default:
-            messageOutput.innerHTML = '<strong>It\'s a draw!</strong>';
-    }
+    const message = { '-1': 'Sorry. You lost. Try again!', 1: 'You are the winner. Congrats', 0: 'It\'s a draw!'};
+    messageOutput.innerHTML = `<strong>${message[app.winner]}</strong>`;
 }
 
 // Reload the full Game
@@ -250,15 +235,15 @@ function loadGame(handNumber) {
     const playerHand = HANDS[handNumber];
     app.finished = true;
     evaluateHand(app.username, playerHand, ({systemHand, gameEval}) => {
-        setComputerChoice(systemHand);
         app.winner = gameEval;
+        app.systemChoice = systemHand;
+        setComputerChoice();
         setGameStatus(app.winner);
         insertIntoHistory(playerHand, systemHand, app.winner);
         setAlert();
         renderMessage(app);
     });
     enableGameButtons();
-    renderComputerChoice();
 }
 
 // START GAME
@@ -274,7 +259,7 @@ function startGame(handNumber) {
             timer.innerText = `Nächste Runde startet in ${count} Sekunden`;
             count--;
         }
-    }, 1000);
+    }, DELAY_MS);
 }
 
 // Auto Type Title

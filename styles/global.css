@@ -17,6 +17,11 @@ body {
 }
 
 .logo {
+    width: 25px;
+    height: 25px;
+}
+
+.gameChoice {
     width: 80px;
     height: 80px;
 }
