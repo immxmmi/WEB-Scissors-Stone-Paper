@@ -19,7 +19,6 @@ const playerStats = {
     },
 };
 
-
 // TIMER
 export const DELAY_MS = 1000;
 
@@ -35,48 +34,64 @@ export function isConnected() {
 }
 
 // HANDS
-export const HANDS = ['scissors', 'stone', 'paper', 'fountain', 'match'];
+export const HANDS = ['Schere', 'Stein', 'Papier', 'Brunnen', 'Streichholz'];
 
 // LIST WITH ALL LOGIC
 const evalLookup = {
-    scissors: {
-        paper: 1,
-        match: 1,
-        scissors: 0,
-        stone: -1,
-        fountain: -1,
+    Schere: {
+        Papier: 1,
+        Streichholz: 1,
+        Schere: 0,
+        Stein: -1,
+        Brunnen: -1,
     },
-    stone: {
-        scissors: 1,
-        match: 1,
-        stone: 0,
-        paper: -1,
-        fountain: -1,
+    Stein: {
+        Schere: 1,
+        Streichholz: 1,
+        Stein: 0,
+        Papier: -1,
+        Brunnen: -1,
     },
-    paper: {
-        scissors: -1,
-        match: -1,
-        paper: 0,
-        fountain: 1,
-        stone: 1,
+    Papier: {
+        Schere: -1,
+        Streichholz: -1,
+        Papier: 0,
+        Brunnen: 1,
+        Stein: 1,
     },
-    fountain: {
-        paper: -1,
-        match: -1,
-        fountain: 0,
-        scissors: 1,
-        stone: 1,
+    Brunnen: {
+        Papier: -1,
+        Streichholz: -1,
+        Brunnen: 0,
+        Schere: 1,
+        Stein: 1,
     },
-    match: {
-        scissors: -1,
-        stone: -1,
-        match: 0,
-        paper: 1,
-        fountain: 1,
+    Streichholz: {
+        Schere: -1,
+        Stein: -1,
+        Streichholz: 0,
+        Papier: 1,
+        Brunnen: 1,
     },
 };
 
-function getRankgingFromServer() {
+
+// Get Anser form Server
+function getGameFromServer(playerName, playerHand) {
+    const params = {
+        playerName,
+        playerHand,
+    };
+    const query = Object.keys(params)
+        .map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`)
+        .join('&');
+
+    const url = `https://stone.sifs0005.infs.ch/play?${query}`;
+
+    return fetch(url);
+}
+
+function getRangingFromServer() {
     const url = 'https://stone.sifs0005.infs.ch/ranking';
     const listPlayer = [];
     let playerList;
@@ -127,9 +142,9 @@ function getRangingFromLocal() {
 export function getRankings(rankingsCallbackHandlerFn) {
     let rankingsArray;
     if (isConnected()) {
-        rankingsArray = getRankgingFromServer();
+        rankingsArray = getRangingFromServer();
     } else {
-         rankingsArray = getRangingFromLocal();
+        rankingsArray = getRangingFromLocal();
     }
     setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
@@ -160,9 +175,23 @@ function getGameEval(playerHand, systemHand) {
 }
 
 export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
-    // optional: in local-mode (isConnected == false) store rankings in the browser localStorage https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API
-    const systemHand = pickHand();
-    const gameEval = getGameEval(playerHand, systemHand);
+    const gameValue = {true: 1, false: '-1', draw: 0};
+    let systemHand;
+    let gameEval;
+    if (isConnected()) {
+        getGameFromServer(playerName, playerHand).then((data) => data.json())
+            .then((json) => {
+                systemHand = json.choice;
+                if (json.choice !== playerHand) {
+                    gameEval = gameValue[json.win];
+                } else {
+                    gameEval = gameValue.draw;
+                }
+            });
+    } else {
+        systemHand = pickHand();
+        gameEval = getGameEval(playerHand, systemHand);
+    }
     addResultToRanking(playerName, gameEval);
     setTimeout(() => gameRecordHandlerCallbackFn({
         playerHand,
