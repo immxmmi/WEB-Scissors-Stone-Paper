@@ -1,35 +1,35 @@
 import {
-    HANDS, isConnected, getRankings, evaluateHand, setConnected, computer, DELAY_MS,
+    HANDS, isConnected, getRankings, evaluateHand, setConnected, DELAY_MS,
 } from './game-service.js';
 // QUERY SELECTOR
 
 // START
-const form = document.querySelector('#form');
-const play = document.querySelector('#play');
-const highScoreTable = document.querySelector('#highScore');
-const status = document.querySelector('#status');
+const form = document.getElementById('form');
+const play = document.getElementById('play');
+const highScoreTable = document.getElementById('highScore');
+const status = document.getElementById('status');
 
 // GAME
-const reception = document.querySelector('#reception');
-const username = document.querySelector('#username-input');
-const displayName = document.querySelector('#displayName');
-const messageOutput = document.querySelector('#message');
-const history = document.querySelector('#history');
-const startSection = document.querySelector('#start');
-const gameSection = document.querySelector('#gameSection');
-const backButton = document.querySelector('#back');
+const reception = document.getElementById('reception');
+const username = document.getElementById('username-input');
+const displayName = document.getElementById('displayName');
+const messageOutput = document.getElementById('message');
+const history = document.getElementById('history');
+const startSection = document.getElementById('start');
+const gameSection = document.getElementById('gameSection');
+const backButton = document.getElementById('back');
 
 // CHOICE
-const scissor = document.querySelector('#scissor');
-const stone = document.querySelector('#stone');
-const paper = document.querySelector('#paper');
-const fountain = document.querySelector('#fountain');
-const match = document.querySelector('#match');
-
-const timer = document.querySelector('#timer');
+const scissor = document.getElementById('scissor');
+const stone = document.getElementById('stone');
+const paper = document.getElementById('paper');
+const fountain = document.getElementById('fountain');
+const match = document.getElementById('match');
+const timer = document.getElementById('timer');
+const computer = document.getElementById('computer');
 
 // AFTER CREATE
-let historyTable = document.querySelector('#historyTable');
+let historyTable = document.getElementById('historyTable');
 
 // INSERT RANKING in LIST
 function reloadRanking() {
@@ -283,10 +283,6 @@ status.addEventListener('click', () => {
 form.addEventListener('submit', (event) => {
     event.preventDefault();
     const user = username.value;
-
-    if (user === '') {
-        return;
-    }
     app.username = user;
     app.currentPage = PAGE.GAME;
     renderView(app);

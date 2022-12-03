@@ -1,7 +1,5 @@
 import {Player} from './player.js';
 
-export const computer = document.querySelector('#computer');
-
 // LOCAL RANK DATA
 const playerStats = {
     Markus: {
@@ -89,7 +87,7 @@ function getRankingsFromPlayerStats() {
             }
         }
         listPlayer.push(
-            new Player(rank, player.user, player.win, player.lost),
+            new Player(rank, player.user, player.win),
         );
     });
     return listPlayer;
