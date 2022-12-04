@@ -5,19 +5,23 @@ export const DELAY_MS = 1000;
 
 // CONNECTION
 let isConnectedState = false;
+
 export function setConnected(newIsConnected) {
     isConnectedState = Boolean(newIsConnected);
 }
+
 export function isConnected() {
     return isConnectedState;
 }
 
 // HANDS
 export const HANDS = ['Schere', 'Stein', 'Papier', 'Brunnen', 'Streichholz'];
+
 // Random Hand
 function pickHand() {
     return HANDS[Math.floor(Math.random() * HANDS.length)];
 }
+
 // List of the Rules
 const evalLookup = {
     Schere: {
@@ -56,6 +60,7 @@ const evalLookup = {
         Brunnen: 1,
     },
 };
+
 // Game Value
 function getGameEval(playerHand, systemHand) {
     return evalLookup[playerHand][systemHand];
@@ -79,6 +84,7 @@ const playerStats = {
         lost: 5,
     },
 };
+
 function getRankingFromLocal() {
     // offline
     const playerList = Object.values(playerStats);
@@ -97,8 +103,11 @@ function getRankingFromLocal() {
     });
     return listPlayer;
 }
+
 export function addResultToRanking(playerName, gameResult) {
-    if (gameResult === 0) { return; }
+    if (gameResult === 0) {
+        return;
+    }
 
     const result = {'-1': 'lost', 1: 'win'};
     const key = result[gameResult];
@@ -124,6 +133,7 @@ function getGameDataFromServer(playerName, playerHand) {
 
     return fetch(url);
 }
+
 function getRankingFromServer() {
     const url = 'https://stone.sifs0005.infs.ch/ranking';
     const listPlayer = [];
@@ -162,6 +172,7 @@ export function getRankings(rankingsCallbackHandlerFn) {
     }
     setTimeout(() => rankingsCallbackHandlerFn(rankingsArray), DELAY_MS);
 }
+
 // Game Handler (Local or Server)
 export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn) {
     const gameValue = {true: 1, false: '-1', draw: 0};
@@ -171,10 +182,8 @@ export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn
         getGameDataFromServer(playerName, playerHand).then((data) => data.json())
             .then((json) => {
                 systemHand = json.choice;
-                if (json.choice !== playerHand) {
+                if (json.choice === playerHand) { gameEval = gameValue.draw; } else {
                     gameEval = gameValue[json.win];
-                } else {
-                    gameEval = gameValue.draw;
                 }
             });
     } else {

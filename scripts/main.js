@@ -1,10 +1,11 @@
 import {
     HANDS, isConnected, getRankings, evaluateHand, setConnected, DELAY_MS,
 } from './game-service.js';
-// QUERY SELECTOR
+
+// GET ELEMENT BY ID
 
 // START
-const form = document.getElementById('form');
+const login = document.getElementById('login');
 const play = document.getElementById('play');
 const highScoreTable = document.getElementById('highScore');
 const status = document.getElementById('status');
@@ -110,7 +111,6 @@ function displayStartPage() {
 
 // Render The massage
 let letterIndex = 0;
-
 function renderStartMessage() {
     letterIndex = 0;
     reception.innerHTML = '';
@@ -269,7 +269,7 @@ status.addEventListener('click', () => {
     changeStatus();
 });
 // set AppState (username and page)
-form.addEventListener('submit', (event) => {
+login.addEventListener('submit', (event) => {
     event.preventDefault();
     app.username = username.value;
     app.currentPage = PAGE.GAME;
