@@ -66,6 +66,20 @@ function getGameEval(playerHand, systemHand) {
     return evalLookup[playerHand][systemHand];
 }
 
+function sortPlayerList(playerList) {
+    return playerList.sort((a, b) => ((a.win < b.win) ? 1 : -1));
+}
+
+function getRightRank(currentRank, currentLustPlayer, win) {
+    let rank = currentRank;
+    if (currentLustPlayer.length !== 0) {
+        if (currentLustPlayer[currentLustPlayer.length - 1].win !== win) {
+            rank++;
+        }
+    }
+    return rank;
+}
+
 // Get Ranking List Local
 const playerStats = {
     Markus: {
@@ -87,19 +101,13 @@ const playerStats = {
 
 function getRankingFromLocal() {
     // offline
-    const playerList = Object.values(playerStats);
+    let playerList = Object.values(playerStats);
     let rank = 1;
     const listPlayer = [];
-    playerList.sort((a, b) => ((a.win < b.win) ? 1 : -1));
+    playerList = sortPlayerList(playerList);
     playerList.forEach((player) => {
-        if (listPlayer.length !== 0) {
-            if (listPlayer[listPlayer.length - 1].win !== player.win) {
-                rank++;
-            }
-        }
-        listPlayer.push(
-            new Player(rank, player.user, player.win, player.lost),
-        );
+        rank = getRightRank(rank, listPlayer, player.win);
+        listPlayer.push(new Player(rank, player.user, player.win, player.lost));
     });
     return listPlayer;
 }
@@ -138,20 +146,16 @@ function getRankingFromServer() {
     const url = 'https://stone.sifs0005.infs.ch/ranking';
     const listPlayer = [];
     let playerList;
+    let rank = 1;
     fetch(url, {
         method: 'GET',
     })
         .then((response) => response.json())
         .then((json) => {
             playerList = Object.values(json);
-            let rank = 1;
-            playerList.sort((a, b) => ((a.win < b.win) ? 1 : -1));
+            playerList = sortPlayerList(playerList);
             playerList.forEach((player) => {
-                if (listPlayer.length !== 0) {
-                    if (listPlayer[listPlayer.length - 1].win !== player.win) {
-                        rank++;
-                    }
-                }
+                rank = getRightRank(rank, listPlayer, player.win);
                 if (!player.user.includes('<')) {
                     listPlayer.push(
                         new Player(rank, player.user, player.win, player.lost),
@@ -182,7 +186,9 @@ export function evaluateHand(playerName, playerHand, gameRecordHandlerCallbackFn
         getGameDataFromServer(playerName, playerHand).then((data) => data.json())
             .then((json) => {
                 systemHand = json.choice;
-                if (json.choice === playerHand) { gameEval = gameValue.draw; } else {
+                if (json.choice === playerHand) {
+                    gameEval = gameValue.draw;
+                } else {
                     gameEval = gameValue[json.win];
                 }
             });

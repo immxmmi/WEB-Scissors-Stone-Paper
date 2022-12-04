@@ -111,6 +111,7 @@ function displayStartPage() {
 
 // Render The massage
 let letterIndex = 0;
+
 function renderStartMessage() {
     letterIndex = 0;
     reception.innerHTML = '';
