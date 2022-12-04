@@ -33,3 +33,13 @@ body {
 #back {
     height: 50px;
 }
+
+#timer {
+    color: darkred;
+}
+
+#computer {
+    margin-top: 5%;
+    margin-bottom: 5%;
+    border: groove black;
+}

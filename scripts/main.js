@@ -81,7 +81,7 @@ function setComputerChoice() {
 }
 
 function renderComputerChoice() {
-    computer.innerHTML = '|?|';
+    computer.innerHTML = '?';
 }
 
 // Hide Element
@@ -223,6 +223,7 @@ function startGame(handNumber) {
             clearInterval(countdown);
             enableGameButtons();
             timer.innerHTML = '';
+            renderComputerChoice();
         } else {
             timer.innerHTML = `Nächste Runde startet in ${count} Sekunden`;
             count--;

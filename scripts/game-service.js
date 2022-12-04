@@ -65,11 +65,9 @@ const evalLookup = {
 function getGameEval(playerHand, systemHand) {
     return evalLookup[playerHand][systemHand];
 }
-
 function sortPlayerList(playerList) {
     return playerList.sort((a, b) => ((a.win < b.win) ? 1 : -1));
 }
-
 function getRightRank(currentRank, currentLustPlayer, win) {
     let rank = currentRank;
     if (currentLustPlayer.length !== 0) {
