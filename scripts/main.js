@@ -30,21 +30,6 @@ const computer = document.getElementById('computer');
 // AFTER CREATE
 let historyTable = document.getElementById('historyTable');
 
-// INSERT RANKING in LIST
-function reloadRanking() {
-    highScoreTable.innerHTML = '';
-    highScoreTable.innerHTML = '<tr><td>Rank</td><td>Player</td><td>Win</td><td>Lost</td></tr>';
-    getRankings((rankings) => rankings.forEach((rankingEntry) => {
-        let tableColor;
-        if (rankingEntry.rank === 1) {
-            tableColor = 'success';
-        } else {
-            tableColor = 'light';
-        }
-        highScoreTable.innerHTML += `<tbody class="table-${tableColor}"><td> ${rankingEntry.rank} </td> <td> ${rankingEntry.name}</td><td>${rankingEntry.win}</td><td>${rankingEntry.lost}</td></tbody>`;
-    }));
-}
-
 // ENUM: PAGE
 const PAGE = {
     START: 0, GAME: 1,
@@ -74,8 +59,22 @@ function newAppState() {
 // INSTANCE of Game
 const app = newAppState();
 
+// reload the rankingList
+function reloadRanking() {
+    highScoreTable.innerHTML = '';
+    highScoreTable.innerHTML = '<tr><td>Rank</td><td>Player</td><td>Win</td><td>Lost</td></tr>';
+    getRankings((rankings) => rankings.forEach((rankingEntry) => {
+        let tableColor;
+        if (rankingEntry.rank === 1) {
+            tableColor = 'success';
+        } else {
+            tableColor = 'light';
+        }
+        highScoreTable.innerHTML += `<tbody class="table-${tableColor}"><td> ${rankingEntry.rank} </td> <td> ${rankingEntry.name}</td><td>${rankingEntry.win}</td><td>${rankingEntry.lost}</td></tbody>`;
+    }));
+}
 
-
+// Show Computer Choice
 function setComputerChoice() {
     computer.innerHTML = app.systemChoice;
 }
@@ -169,7 +168,7 @@ function setGameStatus(result) {
     app.status = alert[result];
 }
 
-// Insert new History
+// insert new history log
 function insertIntoHistory(playerHand, systemHand) {
     historyTable = document.querySelector('#historyTable');
     app.round = historyTable.rows.length;
@@ -200,6 +199,7 @@ function enableGameButtons() {
     match.disabled = false;
 }
 
+// START GAME
 function loadGame(handNumber) {
     const playerHand = HANDS[handNumber];
     app.finished = true;
@@ -212,7 +212,6 @@ function loadGame(handNumber) {
     });
 }
 
-// START GAME
 function startGame(handNumber) {
     app.finished = false;
     disableGameButtons();
@@ -222,8 +221,9 @@ function startGame(handNumber) {
         if (count < 0) {
             clearInterval(countdown);
             enableGameButtons();
+            timer.innerHTML = '';
         } else {
-            timer.innerText = `Nächste Runde startet in ${count} Sekunden`;
+            timer.innerHTML = `Nächste Runde startet in ${count} Sekunden`;
             count--;
         }
     }, DELAY_MS);
@@ -240,36 +240,38 @@ function typeWriter() {
     }
 }
 
+// Type: btn-danger/success
+function changeStatusButton(buttonType) {
+    status.removeAttribute('class');
+    status.setAttribute('class', `btn btn-${buttonType}`);
+}
+
 // Change Online Status
 function changeStatus() {
     if (isConnected()) {
         status.innerHTML = 'Offline';
-        status.removeAttribute('class');
-        status.setAttribute('class', 'btn btn-danger');
+        changeStatusButton('danger');
         app.online = false;
         setConnected(false);
         reloadRanking();
     } else {
         status.innerHTML = 'Online';
-        status.removeAttribute('class');
-        status.setAttribute('class', 'btn btn-success');
-        // CODE --> ONLINE
+        changeStatusButton('success');
         app.online = true;
         setConnected(true);
         reloadRanking();
     }
 }
-// EventListener
 
+// EventListener
 // STATUS ON - OFF Button
 status.addEventListener('click', () => {
     changeStatus();
 });
-// Start Playing: Check Input of Username and set AppState
+// set AppState (username and page)
 form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const user = username.value;
-    app.username = user;
+    app.username = username.value;
     app.currentPage = PAGE.GAME;
     renderView(app);
 });
@@ -301,7 +303,7 @@ match.addEventListener('click', () => {
 backButton.addEventListener('click', (event) => {
     event.preventDefault();
     resetGame(app);
-    app.currentPage = PAGE.START;;
+    app.currentPage = PAGE.START;
     renderView(app);
 });
 
