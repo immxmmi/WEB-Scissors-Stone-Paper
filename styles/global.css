@@ -42,4 +42,10 @@ body {
     margin-top: 5%;
     margin-bottom: 5%;
     border: groove black;
+    color: red;
+}
+
+#displayName {
+    color: blueviolet;
+    font-family: "Comic Sans MS", serif;
 }
