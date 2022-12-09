@@ -10,7 +10,7 @@ const play = document.getElementById('play');
 const highScoreTable = document.getElementById('highScore');
 const status = document.getElementById('status');
 
-// GAME
+// GAME/
 const reception = document.getElementById('reception');
 const username = document.getElementById('username-input');
 const displayName = document.getElementById('displayName');
