@@ -22,6 +22,6 @@
   },
   "dependencies": {
     "@web-and-design/eslint-plugin-wed": "^1.0.0",
-    "html-validator-cli": "^7.0.1"
+    "html-validator-cli": "^2.0.0"
   }
 }
